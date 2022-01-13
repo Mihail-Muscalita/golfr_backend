@@ -107,7 +107,7 @@ describe Api::ScoresController, type: :request do
 
   describe 'GET show' do
     it 'should show the scores for a certain user' do
-      get api_score_path("#{@user1.id}")
+      get api_score_path(@user1.id.to_s)
 
       expect(response).to have_http_status(:ok)
       response_hash = JSON.parse(response.body)
@@ -122,8 +122,12 @@ describe Api::ScoresController, type: :request do
     end
 
     it 'should return error if invalid ID provided' do
-      get api_score_path("55")
+      get api_score_path('55')
       expect(response).not_to have_http_status(:ok)
+
+      response_hash = JSON.parse(response.body)
+      errors = response_hash['errors']
+      expect(errors).to eq 'Invalid user id provided'
     end
   end
 end
