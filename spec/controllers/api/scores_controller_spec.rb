@@ -104,4 +104,26 @@ describe Api::ScoresController, type: :request do
       expect(Score.count).to eq score_count
     end
   end
+
+  describe 'GET show' do
+    it 'should show the scores for a certain user' do
+      get api_score_path("#{@user1.id}")
+
+      expect(response).to have_http_status(:ok)
+      response_hash = JSON.parse(response.body)
+      user_hash = response_hash['user']
+      expect(user_hash['email']).to eq 'user1@email.com'
+
+      scores = response_hash['scores']
+      score_hash = scores.first
+      expect(score_hash['user_name']).to eq 'User1'
+      expect(score_hash['total_score']).to eq 79
+      expect(score_hash['played_at']).to eq '2021-05-20'
+    end
+
+    it 'should return error if invalid ID provided' do
+      get api_score_path("55")
+      expect(response).not_to have_http_status(:ok)
+    end
+  end
 end

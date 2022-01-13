@@ -15,6 +15,26 @@ module Api
       render json: response.to_json
     end
 
+    def show
+      user = User.find_by(id: params[:id])
+      if user
+        scores = Score.includes(:user).where(user_id: params[:id]).order(played_at: :desc, id: :desc)
+        serialized_scores = scores.map(&:serialize)
+        
+        response = {
+          user: user.serializable_hash,
+          scores: serialized_scores
+        }
+
+        render json: response.to_json
+
+      else
+        render json: {
+          errors: 'Invalid user id provided'
+        }, status: :bad_request
+      end
+    end
+
     def create
       score = current_user.scores.build(score_params)
 
