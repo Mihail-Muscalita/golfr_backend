@@ -15,11 +15,12 @@ module Api
       render json: response.to_json
     end
 
-    def show
+    def user_scores
       user = User.find_by(id: params[:id])
       if user
-        scores = Score.includes(:user).where(user_id: params[:id]).order(played_at: :desc,
-                                                                         id: :desc)
+        scores = Score.includes(:user)
+                      .where(user_id: params[:id])
+                      .order(played_at: :desc, id: :desc)
         serialized_scores = scores.map(&:serialize)
         response = {
           user: user.serializable_hash,
